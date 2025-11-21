@@ -25,7 +25,11 @@ Ignora a pasta principal de módulos e as subpastas
 ----------------------------------------
 
 3. Cache do Prisma e Arquivos Temporários
+----------------------------------------
 
+/backend/prisma/generated
+/backend/prisma/dev.db
+/backend/.env
 ----------------------------------------
 
 /backend/prisma/generated
