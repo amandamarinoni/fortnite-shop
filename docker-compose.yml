@@ -19,7 +19,7 @@ services:
   api:
     build:
       context: ./backend 
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: fn-api
     restart: always
     environment:
@@ -36,7 +36,7 @@ services:
   web: 
     build:
       context: ./frontend 
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: fn-web
     restart: always
     ports:
