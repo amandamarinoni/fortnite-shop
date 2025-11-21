@@ -1,12 +1,12 @@
-👾 Fortnite Shop - Desafio Técnico Full Stack
+## 👾 Fortnite Shop - Desafio Técnico Full Stack
 
-🛒 Visão Geral e Objetivo
+## 🛒 Visão Geral e Objetivo
 
 Este projeto ("Fortnite Shop") é uma aplicação web full-stack que demonstra a sua capacidade de construir um sistema transacional, modular e integrado.
 
 Objetivo: Permitir que usuários explorem cosméticos do jogo Fortnite, façam compras usando v-bucks, vejam perfis públicos e históricos de transações.
 
-🎯 Funcionalidades Principais Implementadas
+## 🎯 Funcionalidades Principais Implementadas
 
 Autenticação Segura: Cadastro de usuário com e-mail e senha (bcrypt hash). O usuário recebe 10.000 v-bucks de crédito inicial (registrado como transação).
 
@@ -38,30 +38,27 @@ O projeto é executado com um único comando Docker para replicar o ambiente de 
 
 Certifique-se de ter instalado: Docker e Docker Compose.
 
-1. Configuração
+## 1. Configuração
 
 Clone o repositório e entre na pasta raiz:
-
-git clone [https://github.com/amandamarinoni/fortnite-shop.git](https://github.com/amandamarinoni/fortnite-shop.git)
-cd fortnite-shop
-
+| Git clone | cd fortnite-shop |
+| :--- | :--- |
+| [https://github.com/amandamarinoni/fortnite-shop.git] |(https://github.com/amandamarinoni/fortnite-shop.git) |
 
 Crie o arquivo .env na pasta backend/ com a URL de conexão do Docker:
+| PORT=4002 |
+| --- |
+| DATABASE_URL="postgresql://postgres:admin@db:5432/fortnite_app?schema=public" |
 
-PORT=4002
-DATABASE_URL="postgresql://postgres:admin@db:5432/fortnite_app?schema=public"
-
-
-2. Inicialização
+## 2. Inicialização
 
 Na raiz do projeto (onde está o docker-compose.yml), execute o comando para construir e subir todos os serviços:
 
 docker-compose up --build -d
 
-
 (Aguarde o processo de construção e inicialização dos três containers.)
 
-3. Acesso e Teste
+## 3. Acesso e Teste
 
 Frontend (Site): Acesse http://localhost:5173
 
