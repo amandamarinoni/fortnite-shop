@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # --- 1. Serviço de Banco de Dados (PostgreSQL) ---
+  db:
+    image: postgres:14
+    container_name: fn-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: fortnite_app
+    volumes:
+      - fn-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # --- 2. Serviço de Backend (API Node.js) ---
+  api:
+    build:
+      context: ./backend 
+      dockerfile: Dockerfile
+    container_name: fn-api
+    restart: always
+    environment:
+      # Conexão interna entre containers (usa o nome do serviço 'db')
+      DATABASE_URL: "postgresql://postgres:admin@db:5432/fortnite_app?schema=public"
+    ports:
+      - "4002:4002" # Porta da API (Backend)
+    depends_on:
+      - db
+    # Comando CRÍTICO: Roda as migrações e inicia o servidor
+    command: sh -c "npx prisma migrate deploy && npm run start" 
+
+  # --- 3. Serviço de Frontend (React/Vite com Nginx) ---
+  web: 
+    build:
+      context: ./frontend 
+      dockerfile: Dockerfile
+    container_name: fn-web
+    restart: always
+    ports:
+      - "5173:80" # CORRIGIDO: Mapeia 5173 local para a porta 80 interna do Nginx
+    depends_on:
+      - api # Depende do serviço de backend (API)
+
+volumes:
+  fn-db-data:
