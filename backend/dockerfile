@@ -1,20 +1,25 @@
 FROM node:20-alpine
 
-# Instala OpenSSL
+# 1. Instala OpenSSL (necessário para o Prisma)
 RUN apk add --no-cache openssl
 
+# Define o diretório de trabalho
 WORKDIR /usr/src/app
 
-# COPIA CRÍTICA: Copia tudo de uma vez, incluindo package.json e o código fonte
-COPY . .
+# 2. COPIA CRÍTICA: Copia APENAS package.json e package-lock.json.
+# O source e o destino são explícitos.
+COPY package*.json ./ 
 
-# 1. Instala as dependências (agora o package.json existe)
+# 3. Instala as dependências (Agora o package.json existe)
 RUN npm install 
 RUN npx prisma generate
 
-# 2. Garante permissão de execução
+# 4. Copia o restante do código (incluindo src, controllers, prisma/)
+COPY . .
+
+# 5. Garante permissão de execução
 RUN chmod -R +x .
 
-# 3. Compila e Inicia
+# 6. Compila e Inicia
 RUN npm run build 
 CMD ["npm", "start"]
