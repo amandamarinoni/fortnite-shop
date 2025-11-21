@@ -1,8 +1,9 @@
+# backend/Dockerfile
 FROM node:20-alpine AS build
 WORKDIR /usr/src/app
+
 RUN apk add --no-cache openssl libstdc++ bash git build-base
 
-# dentro do contexto backend (package.json está aqui)
 COPY package*.json ./
 RUN if [ -f package-lock.json ]; then npm ci --no-audit --prefer-offline; else npm install --no-audit --prefer-offline; fi
 
