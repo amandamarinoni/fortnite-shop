@@ -1,46 +1,20 @@
-# --- STAGE 1: Instalação e Geração (BUILDER) ---
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 
-# Instala OpenSSL para conexão segura
+# Instala OpenSSL
 RUN apk add --no-cache openssl
 
 WORKDIR /usr/src/app
 
-# 1. Copia arquivos de dependência e o schema
-# Adiciona o package.json e o prisma/ para a geração
-COPY package*.json ./
-COPY prisma/ ./prisma/
-
-# 2. Instala as dependências
-RUN npm install
-
-# 3. CRÍTICO: Gera o cliente Prisma (tipos e binário Linux)
-RUN npx prisma generate
-
-# 4. Copia o restante do código
+# COPIA CRÍTICA: Copia tudo de uma vez, incluindo package.json e o código fonte
 COPY . .
 
-# 5. Compila o TypeScript para JavaScript
+# 1. Instala as dependências (agora o package.json existe)
+RUN npm install 
+RUN npx prisma generate
+
+# 2. Garante permissão de execução
+RUN chmod -R +x .
+
+# 3. Compila e Inicia
 RUN npm run build 
-
-
-# --- STAGE 2: Produção (RUNNER) ---
-FROM node:20-alpine AS runner
-
-WORKDIR /app
-
-# Instala OpenSSL novamente para o Runtime (necessário para o Prisma Client)
-RUN apk add --no-cache openssl
-
-# Copia APENAS os arquivos necessários para a execução:
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/package*.json ./
-COPY --from=builder /usr/src/app/dist ./dist 
-COPY --from=builder /usr/src/app/src ./src
-
-# CRÍTICO: O arquivo prisma/ deve ser copiado para o runtime para o servidor TS/Node encontrá-lo
-COPY --from=builder /usr/src/app/prisma/ ./prisma/
-
-# Comando de inicialização (Expondo a porta correta)
-EXPOSE 4002 
 CMD ["npm", "start"]
