@@ -1,28 +1,26 @@
 # --- STAGE 1: Instalação e Geração (BUILDER) ---
 FROM node:20-alpine AS builder
 
-# Instala OpenSSL para conexão segura com o PostgreSQL
-RUN apk add --no-cache openssl libstdc++ bash git build-base
+# Instala OpenSSL para conexão segura
+RUN apk add --no-cache openssl
 
 WORKDIR /usr/src/app
 
-# Copia arquivos de dependência e o schema
-COPY backend/package*.json ./
-COPY backend/prisma ./prisma
+# 1. Copia arquivos de dependência e o schema
+# Adiciona o package.json e o prisma/ para a geração
+COPY package*.json ./
+COPY prisma/ ./prisma/
 
-# copiar o restante do backend
-COPY backend ./
-
-# Instala as dependências
+# 2. Instala as dependências
 RUN npm install
 
-# Gera o cliente Prisma (tipos e binário Linux)
+# 3. CRÍTICO: Gera o cliente Prisma (tipos e binário Linux)
 RUN npx prisma generate
 
-# Copia o restante do código
+# 4. Copia o restante do código
 COPY . .
 
-# Compila o TypeScript para JavaScript
+# 5. Compila o TypeScript para JavaScript
 RUN npm run build 
 
 
@@ -31,22 +29,18 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Instala OpenSSL novamente para o Runtime
-RUN apk add --no-cache openssl libstdc++
+# Instala OpenSSL novamente para o Runtime (necessário para o Prisma Client)
+RUN apk add --no-cache openssl
 
-# Copia apenas o que é essencial para execução:
-
-# Copia node_modules (dependências)
+# Copia APENAS os arquivos necessários para a execução:
 COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-# Copia o código compilado (a pasta dist) e o código fonte
+COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/dist ./dist 
 COPY --from=builder /usr/src/app/src ./src
 
-# Copia package.json (para rodar npm start) e prisma/ (para o deploy)
-COPY --from=builder /usr/src/app/package*.json ./
+# CRÍTICO: O arquivo prisma/ deve ser copiado para o runtime para o servidor TS/Node encontrá-lo
 COPY --from=builder /usr/src/app/prisma/ ./prisma/
 
-# Comando de inicialização
-EXPOSE 3000
+# Comando de inicialização (Expondo a porta correta)
+EXPOSE 4002 
 CMD ["npm", "start"]
