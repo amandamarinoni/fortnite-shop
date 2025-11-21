@@ -11,7 +11,6 @@ WORKDIR /usr/src/app
 COPY package*.json ./ 
 
 # 3. Instala as dependências (Agora o package.json existe)
-RUN npm install 
 RUN npx prisma generate
 
 # 4. Copia o restante do código (incluindo src, controllers, prisma/)
