@@ -1,24 +1,18 @@
-FROM node:20-alpine
-
-# 1. Instala OpenSSL (necessário para o Prisma)
-RUN apk add --no-cache openssl
-
-# Define o diretório de trabalho
+FROM node:20-alpine AS build
 WORKDIR /usr/src/app
+RUN apk add --no-cache openssl libstdc++ bash git build-base
 
-# 2. COPIA CRÍTICA: Copia APENAS package.json e package-lock.json.
-# O source e o destino são explícitos.
-COPY package*.json ./ 
+# dentro do contexto backend (package.json está aqui)
+COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci --no-audit --prefer-offline; else npm install --no-audit --prefer-offline; fi
 
-# 3. Instala as dependências (Agora o package.json existe)
+COPY prisma ./prisma
+COPY . .
 RUN npx prisma generate
 
-# 4. Copia o restante do código (incluindo src, controllers, prisma/)
-COPY . .
-
-# 5. Garante permissão de execução
-RUN chmod -R +x .
-
-# 6. Compila e Inicia
-RUN npm run build 
-CMD ["npm", "start"]
+FROM node:20-alpine AS runtime
+WORKDIR /usr/src/app
+RUN apk add --no-cache openssl libstdc++
+COPY --from=build /usr/src/app ./
+EXPOSE 3000
+CMD ["npm","start"]
