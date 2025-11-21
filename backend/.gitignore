@@ -1,0 +1,42 @@
+----------------------------------------
+
+1. Pastas de Dependência - CRÍTICO!
+
+----------------------------------------
+
+Ignora a pasta principal de módulos e as subpastas
+
+/node_modules
+/frontend/node_modules
+/backend/node_modules
+
+----------------------------------------
+
+2. Arquivos de Build e Compilação
+
+----------------------------------------
+
+/frontend/dist
+/backend/dist
+/backend/.tsbuildinfo
+/backend/tsconfig.tsbuildinfo
+/backend/package-lock.json
+
+----------------------------------------
+
+3. Cache do Prisma e Arquivos Temporários
+
+----------------------------------------
+
+/backend/prisma/generated
+/backend/prisma/dev.db
+/backend/.env
+
+----------------------------------------
+
+4. Logs e Ambiente Local
+
+----------------------------------------
+
+npm-debug.log*
+.DS_Store
